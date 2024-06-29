@@ -39,6 +39,9 @@ if __name__ == "__main__":
     # How much is the monthly min repayment?
     min_loan_payment = float(input("\nEnter the minimum loan repayment in CHF: \n"))
 
+    # When did your course finish?
+    course_end_date = input("\nEnter the date when your course finished (YYYY): \n")
+    
     # How much is the monthly savings?
     max_monthly_savings = float(input("\nEnter the monthly savings in CHF: \n"))
 
@@ -57,6 +60,7 @@ if __name__ == "__main__":
     print('\n====================================================================\n')
 
     loan_balance_chf = loan_balance / conversion_rate_chf_to_gbp
+    years_until_forgiveness = 30 - (datetime.now().year - int(course_end_date))
 
     # Create a range of payment scenarios
     payment_scenarios = {}
@@ -69,7 +73,8 @@ if __name__ == "__main__":
                                                loan_payment_percentage = loan_payment_percentage,
                                                investment_annual_return = investment_return,
                                                starting_investment_value = starting_investment_value,
-                                               total_years = total_years
+                                               total_years = total_years,
+                                               years_until_forgiveness = years_until_forgiveness
                     )
         results["Loan Payment Percentage"] = loan_payment_percentage
         payment_scenarios[percentage] = results

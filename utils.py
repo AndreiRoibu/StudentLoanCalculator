@@ -121,7 +121,7 @@ def calculate_investment_growth(initial_amount: float, monthly_contribution: flo
 
 def loan_and_investment_strategy(initial_loan_amount: float, annual_loan_rate: float, monthly_payment: float,
                                     excess_income: float, loan_payment_percentage: float, investment_annual_return: float,
-                                    starting_investment_value: float = 0, total_years: int = 35) -> dict:
+                                    starting_investment_value: float = 0, total_years: int = 35, years_until_forgiveness: int =27) -> dict:
     """
     Determines the strategy for paying off a student loan and investing in the stock market.
 
@@ -143,6 +143,8 @@ def loan_and_investment_strategy(initial_loan_amount: float, annual_loan_rate: f
         The initial amount of the investment, by default 0.
     total_years : int, optional
         The total number of years to simulate, by default 35.
+    years_until_forgiveness : int, optional
+        The number of years until the loan is forgiven, by default 27.
         
     Returns
     -------
@@ -155,6 +157,7 @@ def loan_and_investment_strategy(initial_loan_amount: float, annual_loan_rate: f
 
     """
     total_months = total_years * 12
+    total_months_until_forgiveness = years_until_forgiveness * 12
     additional_loan_payment = excess_income * loan_payment_percentage
     monthly_investment = excess_income - additional_loan_payment
     total_interest_paid = 0
@@ -170,7 +173,7 @@ def loan_and_investment_strategy(initial_loan_amount: float, annual_loan_rate: f
             initial_loan_amount = update_loan_balance(initial_loan_amount, monthly_payment + additional_loan_payment, interest)
 
             # Check if the loan is cleared by forgiveness at the end of the term
-            if month == total_months and initial_loan_amount > 0:
+            if month == total_months_until_forgiveness and initial_loan_amount > 0:
                 total_interest_paid += initial_loan_amount * (annual_loan_rate / 12)  # Add final month's interest if applicable
                 initial_loan_amount = 0  # Forgive the remaining balance
 
@@ -220,7 +223,7 @@ def portfolio_annual_return():
     float
         The annual return of the portfolio.
     """
-    
+
     # Fund returns over 10 years
     return_fund1 = 0.7852  # 78.52%
     return_fund2 = 0.3836  # 38.36%
