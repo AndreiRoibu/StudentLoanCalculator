@@ -60,7 +60,7 @@ if __name__ == "__main__":
     print('\n====================================================================\n')
 
     loan_balance_chf = loan_balance / conversion_rate_chf_to_gbp
-    years_until_forgiveness = 30 - (datetime.now().year - int(course_end_date))
+    years_until_forgiveness = 30 - (datetime.now().year - (int(course_end_date) + 1))
 
     # Create a range of payment scenarios
     payment_scenarios = {}
