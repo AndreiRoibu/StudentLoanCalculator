@@ -25,7 +25,7 @@ python run.py
 ```
 
 This will give you several prompts. Here is an example:
-```bash
+```
 ====================================================================
 We need some financial information to start off with.
 ====================================================================
@@ -42,6 +42,9 @@ Enter the conversion rate between GBP and CHF (default is 1/1.14 = 0.893575 - th
 
 Enter the minimum loan repayment in CHF: 
 400
+
+Enter the date when your course finished (YYYY):
+2015
 
 Enter the monthly savings in CHF: 
 1000
