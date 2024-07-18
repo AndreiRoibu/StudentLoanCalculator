@@ -119,9 +119,19 @@ def calculate_investment_growth(initial_amount: float, monthly_contribution: flo
         current_value = current_value * (1 + monthly_return_rate) + monthly_contribution
     return current_value
 
-def loan_and_investment_strategy(initial_loan_amount: float, annual_loan_rate: float, monthly_payment: float,
-                                    excess_income: float, loan_payment_percentage: float, investment_annual_return: float,
-                                    starting_investment_value: float = 0, total_years: int = 35, years_until_forgiveness: int =27) -> dict:
+def loan_and_investment_strategy(
+        initial_loan_amount: float, 
+        annual_loan_rate: float, 
+        monthly_payment: float,
+        excess_income: float, 
+        loan_payment_percentage: float, 
+        investment_annual_return: float,
+        starting_investment_value: float = 0, 
+        total_years: int = 35, 
+        years_until_forgiveness: int =27,
+        pay_less_months: int = None,
+        pay_less_amount: float = None
+        ) -> dict:
     """
     Determines the strategy for paying off a student loan and investing in the stock market.
 
@@ -145,6 +155,10 @@ def loan_and_investment_strategy(initial_loan_amount: float, annual_loan_rate: f
         The total number of years to simulate, by default 35.
     years_until_forgiveness : int, optional
         The number of years until the loan is forgiven, by default 27.
+    pay_less_months : int, optional
+        The number of months to pay less on the loan, by default None.
+    pay_less_amount : float, optional
+        The amount by which to reduce the monthly loan payment, by default None.
         
     Returns
     -------
@@ -165,27 +179,69 @@ def loan_and_investment_strategy(initial_loan_amount: float, annual_loan_rate: f
     total_months_until_paid = 1
     investment_value_at_loan_paid = starting_investment_value
 
-    for month in range(1, total_months + 1):
-        if initial_loan_amount > 0:
-            # Update loan balance and track interest
-            interest = calculate_monthly_interest(initial_loan_amount, annual_loan_rate)
-            total_interest_paid += interest
-            initial_loan_amount = update_loan_balance(initial_loan_amount, monthly_payment + additional_loan_payment, interest)
+    if pay_less_months:
+        for month in range(1, pay_less_months + 1):
+            if initial_loan_amount > 0:
+                interest = calculate_monthly_interest(initial_loan_amount, annual_loan_rate)
+                total_interest_paid += interest
+                initial_loan_amount = update_loan_balance(initial_loan_amount, pay_less_months + additional_loan_payment, interest)
 
-            # Check if the loan is cleared by forgiveness at the end of the term
-            if month == total_months_until_forgiveness and initial_loan_amount > 0:
-                total_interest_paid += initial_loan_amount * (annual_loan_rate / 12)  # Add final month's interest if applicable
-                initial_loan_amount = 0  # Forgive the remaining balance
+                if month == total_months_until_forgiveness and initial_loan_amount > 0:
+                    total_interest_paid += initial_loan_amount * (annual_loan_rate / 12)  # Add final month's interest if applicable
+                    initial_loan_amount = 0  # Forgive the remaining balance
 
-            total_months_until_paid = month
-            investment_value_at_loan_paid = investment_value
+                total_months_until_paid = month
+                investment_value_at_loan_paid = investment_value
+            else:
+                monthly_investment = excess_income + pay_less_months
 
-        else:
-            # Once the loan is paid off, all excess income goes to investment + monthly payment
-            monthly_investment = excess_income + monthly_payment
+            investment_value = calculate_investment_growth(investment_value, monthly_investment + (monthly_payment - pay_less_months), investment_annual_return, 1)
 
-        # Update investment value
-        investment_value = calculate_investment_growth(investment_value, monthly_investment, investment_annual_return, 1)
+        for month in range(pay_less_months, total_months+1):
+            if initial_loan_amount > 0:
+                # Update loan balance and track interest
+                interest = calculate_monthly_interest(initial_loan_amount, annual_loan_rate)
+                total_interest_paid += interest
+                initial_loan_amount = update_loan_balance(initial_loan_amount, monthly_payment + additional_loan_payment, interest)
+
+                # Check if the loan is cleared by forgiveness at the end of the term
+                if month == total_months_until_forgiveness and initial_loan_amount > 0:
+                    total_interest_paid += initial_loan_amount * (annual_loan_rate / 12)  # Add final month's interest if applicable
+                    initial_loan_amount = 0  # Forgive the remaining balance
+
+                total_months_until_paid = month
+                investment_value_at_loan_paid = investment_value
+
+            else:
+                # Once the loan is paid off, all excess income goes to investment + monthly payment
+                monthly_investment = excess_income + monthly_payment
+
+            # Update investment value
+            investment_value = calculate_investment_growth(investment_value, monthly_investment, investment_annual_return, 1)
+
+    else:
+
+        for month in range(1, total_months + 1):
+            if initial_loan_amount > 0:
+                # Update loan balance and track interest
+                interest = calculate_monthly_interest(initial_loan_amount, annual_loan_rate)
+                total_interest_paid += interest
+                initial_loan_amount = update_loan_balance(initial_loan_amount, monthly_payment + additional_loan_payment, interest)
+
+                # Check if the loan is cleared by forgiveness at the end of the term
+                if month == total_months_until_forgiveness and initial_loan_amount > 0:
+                    total_interest_paid += initial_loan_amount * (annual_loan_rate / 12)  # Add final month's interest if applicable
+                    initial_loan_amount = 0  # Forgive the remaining balance
+
+                total_months_until_paid = month
+                investment_value_at_loan_paid = investment_value
+
+            else:
+                # Once the loan is paid off, all excess income goes to investment + monthly payment
+                monthly_investment = excess_income + monthly_payment
+
+            # Update investment value
+            investment_value = calculate_investment_growth(investment_value, monthly_investment, investment_annual_return, 1)
 
     return {
         "months_until_loan_paid": total_months_until_paid,

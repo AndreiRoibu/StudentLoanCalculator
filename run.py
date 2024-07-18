@@ -57,6 +57,26 @@ if __name__ == "__main__":
     # Unique identifier for the run (optional)
     unique_identifier = input("\nEnter a unique identifier for this run (optional): \n")
 
+    # EXTRA!
+    # Do you want to pay less for a few months?
+    pay_less_flag = input("\nDo you want to pay less for a few months? (0/1): \n")
+    if pay_less_flag == "1":
+        pay_less_flag = True
+    else:
+        pay_less_flag = False
+
+    if pay_less_flag:
+        # How many months?
+        pay_less_months = int(input("\nHow many months do you want to pay less? \n"))
+
+        # How much less?
+        pay_less_amount = float(input("\nHow much less do you want to pay? \n"))
+    
+    else:
+        pay_less_months = None
+        pay_less_amount = None
+
+
     print('\n====================================================================\n')
 
     loan_balance_chf = loan_balance / conversion_rate_chf_to_gbp
@@ -66,15 +86,18 @@ if __name__ == "__main__":
     payment_scenarios = {}
     for percentage in range(0, 105, 5):
         loan_payment_percentage = percentage / 100
-        results = loan_and_investment_strategy(initial_loan_amount=loan_balance_chf,
-                                               annual_loan_rate=loan_interest_rate,
-                                               monthly_payment = min_loan_payment,
-                                               excess_income= max_monthly_savings,
-                                               loan_payment_percentage = loan_payment_percentage,
-                                               investment_annual_return = investment_return,
-                                               starting_investment_value = starting_investment_value,
-                                               total_years = total_years,
-                                               years_until_forgiveness = years_until_forgiveness
+        results = loan_and_investment_strategy(
+                                            initial_loan_amount=loan_balance_chf,
+                                            annual_loan_rate=loan_interest_rate,
+                                            monthly_payment = min_loan_payment,
+                                            excess_income= max_monthly_savings,
+                                            loan_payment_percentage = loan_payment_percentage,
+                                            investment_annual_return = investment_return,
+                                            starting_investment_value = starting_investment_value,
+                                            total_years = total_years,
+                                            years_until_forgiveness = years_until_forgiveness,
+                                            pay_less_months = pay_less_months,
+                                            pay_less_amount = pay_less_amount
                     )
         results["Loan Payment Percentage"] = loan_payment_percentage
         payment_scenarios[percentage] = results
@@ -107,7 +130,7 @@ if __name__ == "__main__":
     plt.ylabel("Final Investment Value CHF")
     plt.title("Effect of Additional Loan Payment on Investment Value")
     plt.legend()
-    # Adjust plot margins
+    # Adjust plot margsins
     plt.subplots_adjust(right=0.7)  # Adjust this value based on your needs to make room for the text
 
     # Print assumptions to the right of the plot
